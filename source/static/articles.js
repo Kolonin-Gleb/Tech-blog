@@ -1,53 +1,53 @@
 $(function() {
-	$('#author_list').text('Идёт загрузка списка авторов');
-	loadAuthorList();
+	$('#article_list').text('Идёт загрузка списка статей');
+	loadArticleList();
 });
 
-$('#save_author').click(function () {
-    console.log('Сохранение автора');
+$('#save_article').click(function () {
+    console.log('Сохранение статьи');
     saveAuthor();
 });
 
 function renderEditButton() {
     $('.edit_button').click(function (e) {
-        console.log('Редактирование автора');
+        console.log('Редактирование статьи');
         var el = e.target;
         var id = el.getAttribute('data-id');
-        getAuthor(id);
+        getArticle(id);
         console.log(id);
     });
 
     $('.delete_button').click(function (e) {
-        console.log('Удаление автора');
+        console.log('Удаление статьи');
         var el = e.target;
         var id = el.getAttribute('data-id');
-        deleteAuthor(id);
+        deleteArticle(id);
         console.log(id);
     });
 
     $('#add_button').click(function () {
-        console.log('Добваление автора');
-        getAuthor(0);
+        console.log('Добваление статьи');
+        getArticle(0);
         console.log("Объект: "+id);
     });
 }
 
-function loadAuthorList()
+function loadArticleList()
 {
     $.ajax({
-        url: '/get_author_list',
+        url: '/get_article_list',
         type: 'GET',
         dataType: 'json',
         success: function (data) {
             console.log(data);
             if (data instanceof Array)
             {
-				console.log("Успешная загрузка авторов");
-                renderAuthorList(data);
+				console.log("Успешная загрузка статей");
+                renderArticleList(data);
             }
             else
             {
-				console.log("Ошибка при загрузке авторов");
+				console.log("Ошибка при загрузке статей");
             }
         },
         error: function(jqxhr, status, errorMsg) {
@@ -57,13 +57,13 @@ function loadAuthorList()
 }
 
 // Загрузка конкретного контакта
-function getAuthor(id)
+function getArticle(id)
 {
     $.ajax({
-        url: '/get_author',
+        url: '/get_article',
         type: 'POST',
         dataType: 'json',
-        // Запрос на данные об 1 авторе по id
+        // Запрос на данные об 1 статье по id
         data: {
             id: id
         },
@@ -71,12 +71,12 @@ function getAuthor(id)
             console.log(data);
             if (data.status == 'ok')
             {
-                console.log("Автор загружен");
+                console.log("Статья загружена");
                 renderForm(data.user);
             }
             else
             {
-                console.log("Ошибка при загрузке автора");
+                console.log("Ошибка при загрузке статьи");
             }
         },
         error: function(jqxhr, status, errorMsg) {
@@ -85,10 +85,10 @@ function getAuthor(id)
     });
 }
 
-function deleteAuthor(id)
+function deleteArticle(id)
 {
     $.ajax({
-        url: '/delete_author',
+        url: '/delete_article',
         type: 'POST',
         dataType: 'json',
         data: {
@@ -98,12 +98,12 @@ function deleteAuthor(id)
             console.log(data);
             if (data.status == 'ok')
             {
-                console.log("Автор удален");
-                loadAuthorList();
+                console.log("Статья удалена");
+                loadArticleList();
             }
             else
             {
-                console.log("Ошибка при удалении автора");
+                console.log("Ошибка при удалении статьи");
             }
         },
         error: function(jqxhr, status, errorMsg) {
@@ -113,31 +113,31 @@ function deleteAuthor(id)
 }
 
 // Передача данных из формы на backend
-function saveAuthor()
+function saveArticle()
 {
     $.ajax({
-        url: '/save_author',
+        url: '/save_article',
         type: 'POST',
         dataType: 'json',
-        // Взятие данных из формы по атрибуту id, упаковка их в data и отправка на url: '/save_author'
         data: {
             id: $('#id').val(),
-            f: $('#f').val(),
-            i: $('#i').val(),
-            o: $('#o').val(),
+            fio: $('#fio').val(),
+            category: $('#category').val(),
+            title: $('#title').val(),
+            article: $('#article').val(),
+            dt: $('#dt').val(),
         },
-        // Обработка ответа на запрос return jsonify(out_data)
         success: function (data) {
             console.log(data);
             if (data.status == 'ok')
             {
-                console.log("Автор сохранен");
+                console.log("Статья сохранена");
                 loadAuthorList();
-                $('#author_form').hide();
+                $('#article_form').hide();
             }
             else
             {
-                console.log("Ошибка при сохранении автора");
+                console.log("Ошибка при сохранении статьи");
             }
         },
         error: function(jqxhr, status, errorMsg) {
@@ -146,33 +146,38 @@ function saveAuthor()
     });
 }
 
-// Отображение списка авторов
-function renderAuthorList(data)
+function renderArticleList(data)
 {
-    var html = '<p><button class="btn btn-primary" id="add_button">Добавить автора</button></p>';
+    var html = '<p><button class="btn btn-primary" id="add_button">Добавить статью</button></p>';
     html += '<table class="table table-bordered small">';
     // Оформляем каждый элемент в виде строчки у таблицы
     data.forEach(function(item, i, data) {
         html += "<tr>";
-        html += "<td>"+item['f']+"</td>";
-        html += "<td>"+item['i']+"</td>";
-        html += "<td>"+item['o']+"</td>";
+        html += "<td>"+item['fio']+"</td>";
+        html += "<td>"+item['category']+"</td>";
+        html += "<td>"+item['title']+"</td>";
+        html += "<td>"+item['article']+"</td>";
+        html += "<td>"+item['dt']+"</td>";
+
         html += '<td><i class="bi bi-pencil-square edit_button" data-id="'+item['id']+'"></i></td>';
         html += '<td><i class="bi bi-trash delete_button" data-id="'+item['id']+'"></i></td>';
         html += "</tr>";
     });
     html += "</table>";
 
-    $('#author_list').html(html);
+    $('#article_list').html(html);
     renderEditButton();
 }
 
 function renderForm(data) {
     $('#id').val(data['id']),
-    $('#f').val(data['f']),
-    $('#i').val(data['i']),
-    $('#o').val(data['o']),
+    $('#fio').val(data['fio']),
+    $('#category').val(data['category']),
+    $('#title').val(data['title']),
+    $('#article').val(data['article']),
+    $('#dt').val(data['dt']),
 
-    $('#author_form').show();
+    $('#article_form').show();
 }
+
 

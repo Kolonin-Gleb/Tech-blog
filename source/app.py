@@ -6,12 +6,6 @@ from flask import request, jsonify
 import pymysql
 from pymysql.cursors import DictCursor
 
-# Для получения времени публикации статьи
-# from datetime import datetime
-# Для пагинации
-# from flask import render_template, redirect
-# from flask import url_for # Используется в других файлах
-
 # Основным файлом для работы с Flask будет файл app.py
 # Папка static будет содержать неизменяемый JS и CSS
 app = Flask(__name__, static_folder="static")
@@ -28,6 +22,7 @@ dbh = pymysql.connect(
     )
     
 # Запуск страниц сайта
+@app.route('/home')
 @app.route('/')
 def main_page():
     html = open("index.html", "r")
@@ -84,7 +79,7 @@ def get_author():
                 author_data = cur.fetchall()
                 out_data = {
                     'status': 'ok', # Установка статуса, что опреация выполнена успешно. # Нужно для работы JS функций
-                    'user': author_data[0], # Сохранение всех данных о выбранном пользователе
+                    'author': author_data[0], # Сохранение всех данных о выбранном пользователе
                 }
         except:
             out_data = {
@@ -92,7 +87,7 @@ def get_author():
             }
     # Создание нового автора
     else:
-        u = {
+        new_author = {
             'f': '',
             'i': '',
             'o': '',
@@ -100,7 +95,7 @@ def get_author():
         }
         out_data = {
             'status': 'ok',
-            'user': u,
+            'author': new_author,
         }
     return jsonify(out_data)
 
@@ -187,7 +182,7 @@ def get_category():
                 category_data = cur.fetchall()
                 out_data = {
                     'status': 'ok',
-                    'user': category_data[0], 
+                    'category': category_data[0], 
                 }
         except:
             out_data = {
@@ -195,13 +190,13 @@ def get_category():
             }
     # Создание новой категории
     else:
-        u = {
+        new_category = {
             'category': '',
             'id': 0
         }
         out_data = {
             'status': 'ok',
-            'user': u,
+            'category': new_category,
         }
     return jsonify(out_data)
 
@@ -258,8 +253,119 @@ def save_category():
 
     return jsonify(out_data)
 
+# Обработка запросов к странице articles #################################################
+
+@app.route('/get_article_list')
+def get_article_list():
+    try:
+        with dbh.cursor() as cur:
+            cur.execute('SELECT * FROM blog_articles_full')
+            categories = cur.fetchall()
+    except:
+        categories = { 'error': 'Ошибка чтения представления статей' }
+
+    return jsonify(categories)
+
+
+@app.route('/get_article', methods=['POST'])
+def get_article():
+    out_data = {'status': 'error'}
+    id = request.form.get('id') # получение id строчки категории из таблицы
+
+    # Действия над существующей категорией
+    if int(id) > 0:
+        try:
+            with dbh.cursor() as cur:
+                # Получение данных из представления статей
+                cur.execute('SELECT * FROM blog_articles_full WHERE id='+str(id))
+                article_data = cur.fetchall()
+                out_data = {
+                    'status': 'ok',
+                    'article': article_data[0], 
+                }
+        except:
+            out_data = {
+                'status': 'error'
+            }
+    # Создание новой статьи
+    else:
+        new_article = {
+            'id': 0,
+            'fio': '',
+            'category': '',
+            'title': '',
+            'article': '',
+            'dt': '',
+            'likes': 0,
+        }
+        out_data = {
+            'status': 'ok',
+            'article': new_article,
+        }
+    return jsonify(out_data)
+
+
+@app.route('/delete_article', methods=['POST'])
+def delete_article():
+    out_data = {'status': 'error'}
+    id = request.form.get('id')
+
+    if int(id) > 0:
+        try:
+            with dbh.cursor() as cur:
+                cur.execute('DELETE FROM blog_articles_full WHERE id = '+str(id))
+                out_data = {
+                    'status': 'ok',
+                }
+        except:
+            out_data = {
+                'status': 'error'
+            }
+
+    return jsonify(out_data)
+
+
+@app.route('/save_article', methods=['POST'])
+def save_article():
+    # Получение данных data с помощью библ. request
+    id = int(request.form.get('id'))
+    fio = str(request.form.get('fio'))
+    category = str(request.form.get('category'))
+    title = str(request.form.get('title'))
+    article = str(request.form.get('article'))
+    dt = str(request.form.get('dt'))
+    likes = int(request.form.get('id'))
+
+    # Проверка получения данных
+    print(f"{id}, {fio}, {category}, {title}, {article}, {dt}, {likes}")
+
+    sql = ''
+    if id > 0:
+        sql = f"UPDATE blog_articles_full SET fio='{fio}', category='{category}'"
+        sql += f" title='{title}', article='{article}', dt='{dt}', likes='{likes}'"
+        sql += f" WHERE id={id}"
+    else:
+        sql = "INSERT INTO blog_articles_full (fio, category, title, article, dt, likes)"
+        sql += f" VALUE ('{fio}', '{category}', '{title}', '{article}', '{dt}', '{likes}')"
+
+    # Попытка выполнить sql
+    print(sql)
+    try:
+        with dbh.cursor() as cur:
+            cur.execute(sql)
+            out_data = {
+                'status': 'ok'
+            }
+    except:
+        out_data = {
+            'status': 'error'
+        }
+
+    return jsonify(out_data)
+
+
 # Запуск приложения на сервере колледжа
-app.run(debug = True, host='db-learning.ithub.ru', port=1110)
+app.run(debug = True, host='db-learning.ithub.ru', port=1198)
 
 # Запуск приложения на локальном пк
 # app.run(debug=True)

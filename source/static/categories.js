@@ -1,3 +1,8 @@
+$(function() {
+	$('#category_list').text('Идёт загрузка списка категорий');
+	loadCategoryList();
+});
+
 $('#save_category').click(function () {
     console.log('Сохранение категории');
     saveCategory();
@@ -63,7 +68,7 @@ function getCategory(id)
             if (data.status == 'ok')
             {
                 console.log("Категория загружена");
-                renderForm(data.user);
+                renderForm(data.category);
             }
             else
             {
@@ -143,7 +148,7 @@ function renderCategoryList(data)
     // Оформляем каждый элемент в виде строчки у таблицы
     data.forEach(function(item, i, data) {
         html += "<tr>";
-        html += "<td>"+item['name']+"</td>";
+        html += "<td>"+item['category']+"</td>";
         html += '<td><i class="bi bi-pencil-square edit_button" data-id="'+item['id']+'"></i></td>';
         html += '<td><i class="bi bi-trash delete_button" data-id="'+item['id']+'"></i></td>';
         html += "</tr>";
@@ -160,7 +165,3 @@ function renderForm(data) {
     $('#category_form').show();
 }
 
-$(function() {
-	$('#category_list').text('Идёт загрузка списка категорий');
-	loadCategoryList();
-});

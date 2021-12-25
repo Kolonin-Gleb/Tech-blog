@@ -3,11 +3,10 @@
 <head>
 	<title>Категории статей</title>
 
-	<!-- Загружаем CSS -->
 	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
-	<link href="./static/style.css" rel="stylesheet">
-
 	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
+	
+	<link href="./static/style.css" rel="stylesheet">
 </head>
 <body>
 
@@ -22,7 +21,6 @@
 			<!-- Форма редактирования статей -->
 			<div class="col-lg-4" id="category_frame">
 				<div id="category_form" style="display: none">
-					<h3>Категория</h3>
 					<form>
 						<input type="hidden" id="id" value="0"> <!-- Невидимый id каждой строки таблицы -->
 						<div class="mb-3">
@@ -30,13 +28,14 @@
 							<input type="text" class="form-control" id="category">
 						</div>
 
-						<div class="btn btn-primary" id="save_category">Сохранить категорию</div>
+						<div class="btn btn-primary" id="save_category">Сохранить</div>
 					</form>
 				</div>
 			</div>
         </div>
     </div>
 
+    <button class="btn-primary" onclick="document.location='./home'">Назад</button>
 
 	<!-- Загрузка JS -->
 	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
