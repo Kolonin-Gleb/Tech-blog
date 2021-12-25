@@ -41,6 +41,12 @@ def authors_page():
     html.close()
     return page
 
+@app.route('/categories')
+def categories_page():
+    html = open("categories.html", "r")
+    page = html.read()
+    html.close()
+    return page
 
 @app.route('/get_author_list')
 def get_author_list():
