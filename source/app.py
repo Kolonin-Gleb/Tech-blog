@@ -24,100 +24,116 @@ dbh = pymysql.connect(
         autocommit=True
     )
 
-
-# app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///blog.db' #Установка бд sqlite с которой будет вестись работа
-# #blog.db - название БД
-# app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-# db = SQLAlchemy(app)
-
-
-# # Класс для манипуляции с БД
-# class Article(db.Model):
-#     # Создание полей БД
-#     id = db.Column(db.Integer, primary_key=True) # поле id, что может хранить только целые числа
-#     title = db.Column(db.String(100), nullable=False)
-#     intro = db.Column(db.String(300), nullable=False)
-#     text = db.Column(db.Text, nullable=False)
-#     date = db.Column(db.DateTime, default=datetime.utcnow) # По умолч. время создания статьи - текущее
-
-#     # Метод возвращающий объект и его id
-#     def __repr__(self):
-#         return '<Article %r>' % self.id
-
 @app.route('/')
-@app.route('/home')
 def index():
-    return render_template("index.html")
-
-@app.route('/about')
-def about():
-    return render_template("about.html")
-
-# @app.route('/posts')
-# def posts():
-#     articles = Article.query.order_by(Article.date.desc()).all() # Создание списка всех данных из бд отсортированных по дате
-#     return render_template("posts.html", articles=articles) # Передача шаблона и списка данных из бд
-
-# #Переход на конкретную статью
-# @app.route('/posts/<int:id>')
-# def post_detail(id):
-#     article = Article.query.get(id) # Получение статьи с заданным id
-#     return render_template("post_detail.html", article=article) # Передача шаблона и списка данных из бд
-
-# #Переход на удаление статьи
-# @app.route('/posts/<int:id>/del')
-# def post_delete(id):
-#     article = Article.query.get_or_404(id) # Получение статьи с заданным id из бд
-
-#     try:
-#         db.session.delete(article)
-#         db.session.commit()
-#         return redirect('/posts')
-#     except:
-#         return "Ошибка удаления статьи"
-
-# #Переход на редактирование статьи
-# @app.route('/posts/<int:id>/update', methods=['POST', 'GET'])
-# def post_update(id):
-#     article = Article.query.get_or_404(id)
-
-#     if request.method == 'POST':  # Если идёт добавление данных
-#         # Внесение изменений в объект в бд
-#         article.title = request.form['title']
-#         article.intro = request.form['intro']
-#         article.text = request.form['text']
-
-#         try:
-#             db.session.commit()
-#             return redirect('/posts')
-#         except:
-#             return "Ошибка редактирования статьи"
-#     else:
-#         return render_template("post_update.html", article=article)  # Передача шаблона и списка данных из бд
+    index = open("index.html", "r")
+    page = index.read()
+    index.close()
+    return page
 
 
-# @app.route('/create-article', methods=['POST', 'GET']) # Для обработки POST и GET запросов
-# def create_article():
-#     if request.method == 'POST': # Если идёт добавление данных
-#         # Сохранение данных из формы в переменные
-#         title = request.form['title']
-#         intro = request.form['intro']
-#         text = request.form['text']
+@app.route('/get_author_list')
+def get_author_list():
+    try:
+        with dbh.cursor() as cur:
+            cur.execute('SELECT * FROM blog_authors')
+            authors = cur.fetchall()
+    except:
+        authors = { 'error': 'Ошибка чтения таблицы авторов' }
 
-#         # Создание объекта, что будет добавляться в БД
-#         article = Article(title=title, intro=intro, text=text)
+    return jsonify(authors)
 
-#         try:
-#             db.session.add(article) # Нет необходимости в SQL запросе
-#             db.session.commit()
-#             return redirect('/posts') # Перенаправление пользователя
-#         except:
-#             return "Ошибка добавления статьи"
-#     else: # Если идёт простое отображение данных
-#         return render_template("create-article.html")
+
+@app.route('/get_author', methods=['POST'])
+def get_author():
+    out_data = {'status': 'error'}
+    id = request.form.get('id') # получение id строчки контакта из таблицы
+
+    # Действия над существующим автором
+    if int(id) > 0:
+        try:
+            with dbh.cursor() as cur:
+                # Получение данных из таблицы об авторе
+                cur.execute('SELECT * FROM blog_authors WHERE id='+str(id))
+                contact_data = cur.fetchall()
+                out_data = {
+                    'status': 'ok', # Установка статуса, что опреация выполнена успешно. # Нужно для работы JS функций
+                    'user': contact_data[0], # Сохранение всех данных о выбранном пользователе
+                }
+        except:
+            out_data = {
+                'status': 'error'
+            }
+    # Создание нового автора
+    else:
+        u = {
+            'f': '',
+            'i': '',
+            'o': '',
+            'id': 0
+        }
+        out_data = {
+            'status': 'ok',
+            'user': u,
+        }
+    return jsonify(out_data)
+
+
+@app.route('/delete_author', methods=['POST'])
+def delete_author():
+    out_data = {'status': 'error'}
+    id = request.form.get('id')
+
+    if int(id) > 0:
+        try:
+            with dbh.cursor() as cur:
+                cur.execute('DELETE FROM blog_authors WHERE id = '+str(id))
+                out_data = {
+                    'status': 'ok',
+                }
+        except:
+            out_data = {
+                'status': 'error'
+            }
+
+    return jsonify(out_data)
+
+
+# Эта функция сохраняет данные формы
+@app.route('/save_author', methods=['POST'])
+def save_author():
+    # Получение данных data с помощью библ. request
+    id = int(request.form.get('id'))
+    f = request.form.get('f')
+    i = request.form.get('i')
+    o = request.form.get('o')
+
+    # Проверка получения данных
+    print(f"{id}, {f}, {i}, {o}")
+
+    sql = ''
+    if id > 0:
+        sql = f"UPDATE blog_authors SET f='{f}', i='{i}', o='{o}' WHERE id={id}"
+    else:
+        sql = "INSERT INTO blog_authors (f, i, o)"
+
+    # Попытка выполнить sql
+    print(sql)
+    try:
+        with dbh.cursor() as cur:
+            cur.execute(sql)
+            out_data = {
+                'status': 'ok'
+            }
+    except:
+        out_data = {
+            'status': 'error'
+        }
+
+    return jsonify(out_data)
 
 # Запуск приложения на сервере колледжа
-# app.run(debug = True, host='db-learning.ithub.ru', port=1110)
+app.run(debug = True, host='db-learning.ithub.ru', port=1110)
 
 # Запуск приложения на локальном пк
-app.run(debug=True) # Режим debug следует включить при разработке для того, чтобы видеть ошибки
+# app.run(debug=True)
