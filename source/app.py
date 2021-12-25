@@ -26,7 +26,8 @@ dbh = pymysql.connect(
         cursorclass=DictCursor,
         autocommit=True
     )
-
+    
+# Запуск страниц сайта
 @app.route('/')
 def main_page():
     html = open("index.html", "r")
@@ -54,6 +55,8 @@ def articles_page():
     page = html.read()
     html.close()
     return page
+
+# Обработка запросов к странице authors #################################################
 
 @app.route('/get_author_list')
 def get_author_list():
@@ -140,6 +143,105 @@ def save_author():
     else:
         sql = "INSERT INTO blog_authors (f, i, o)"
         sql += f" VALUES('{f}','{i}','{o}')"
+
+    # Попытка выполнить sql
+    print(sql)
+    try:
+        with dbh.cursor() as cur:
+            cur.execute(sql)
+            out_data = {
+                'status': 'ok'
+            }
+    except:
+        out_data = {
+            'status': 'error'
+        }
+
+    return jsonify(out_data)
+
+# Обработка запросов к странице categories #################################################
+
+@app.route('/get_category_list')
+def get_category_list():
+    try:
+        with dbh.cursor() as cur:
+            cur.execute('SELECT * FROM blog_categories')
+            categories = cur.fetchall()
+    except:
+        categories = { 'error': 'Ошибка чтения таблицы авторов' }
+
+    return jsonify(categories)
+
+
+@app.route('/get_category', methods=['POST'])
+def get_category():
+    out_data = {'status': 'error'}
+    id = request.form.get('id') # получение id строчки категории из таблицы
+
+    # Действия над существующей категорией
+    if int(id) > 0:
+        try:
+            with dbh.cursor() as cur:
+                # Получение данных из таблицы о категории
+                cur.execute('SELECT * FROM blog_categories WHERE id='+str(id))
+                category_data = cur.fetchall()
+                out_data = {
+                    'status': 'ok',
+                    'user': category_data[0], 
+                }
+        except:
+            out_data = {
+                'status': 'error'
+            }
+    # Создание новой категории
+    else:
+        u = {
+            'category': '',
+            'id': 0
+        }
+        out_data = {
+            'status': 'ok',
+            'user': u,
+        }
+    return jsonify(out_data)
+
+
+@app.route('/delete_category', methods=['POST'])
+def delete_category():
+    out_data = {'status': 'error'}
+    id = request.form.get('id')
+
+    if int(id) > 0:
+        try:
+            with dbh.cursor() as cur:
+                cur.execute('DELETE FROM blog_categories WHERE id = '+str(id))
+                out_data = {
+                    'status': 'ok',
+                }
+        except:
+            out_data = {
+                'status': 'error'
+            }
+
+    return jsonify(out_data)
+
+
+# Эта функция сохраняет данные формы
+@app.route('/save_category', methods=['POST'])
+def save_category():
+    # Получение данных data с помощью библ. request
+    id = int(request.form.get('id'))
+    category = request.form.get('category')
+
+    # Проверка получения данных
+    print(f"{id}, {category}")
+
+    sql = ''
+    if id > 0:
+        sql = f"UPDATE blog_categories SET name='{category}' WHERE id={id}"
+    else:
+        sql = "INSERT INTO blog_categories (name)"
+        sql += f" VALUE ('{category}')"
 
     # Попытка выполнить sql
     print(sql)
