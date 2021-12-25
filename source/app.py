@@ -48,6 +48,13 @@ def categories_page():
     html.close()
     return page
 
+@app.route('/articles')
+def articles_page():
+    html = open("articles.html", "r")
+    page = html.read()
+    html.close()
+    return page
+
 @app.route('/get_author_list')
 def get_author_list():
     try:

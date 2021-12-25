@@ -1,3 +1,23 @@
+/*Cтили для кнопок перехода по страницам*/
+.btn {
+    width: 100%;
+    text-align: center;
+    background: gray;
+    color: rgb(234, 247, 51);
+    font-size: 50px;
+    border-radius: 5px;
+
+    /*Change color on hover*/
+    -webkit-transition-duration: 0.4s;
+    transition-duration: 0.4s;
+}
+
+.btn:hover {
+    background-color: #4CAF50;
+    color: white;
+}
+
+/*Cтили для кнопок перехода редактирования*/
 .edit_button {
     cursor: pointer;
     color: rgb(13, 110, 253);
