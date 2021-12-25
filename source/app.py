@@ -28,10 +28,17 @@ dbh = pymysql.connect(
     )
 
 @app.route('/')
-def index():
-    index = open("index.html", "r")
-    page = index.read()
-    index.close()
+def main_page():
+    html = open("index.html", "r")
+    page = html.read()
+    html.close()
+    return page
+
+@app.route('/authors')
+def authors_page():
+    html = open("authors.html", "r")
+    page = html.read()
+    html.close()
     return page
 
 
