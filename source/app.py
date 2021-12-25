@@ -1,13 +1,16 @@
-# Для разработки сайта и пагинации
-from flask import Flask, render_template, redirect
+# Для разработки сайта 
+from flask import Flask
 # Для получения и ответа на Ajax запросы в формате json
 from flask import request, jsonify
 # Для работы с БД
 import pymysql
 from pymysql.cursors import DictCursor
 
-# from flask import url_for # Используется в других файлах
+# Для получения времени публикации статьи
 # from datetime import datetime
+# Для пагинации
+# from flask import render_template, redirect
+# from flask import url_for # Используется в других файлах
 
 # Основным файлом для работы с Flask будет файл app.py
 # Папка static будет содержать неизменяемый JS и CSS
@@ -55,10 +58,10 @@ def get_author():
             with dbh.cursor() as cur:
                 # Получение данных из таблицы об авторе
                 cur.execute('SELECT * FROM blog_authors WHERE id='+str(id))
-                contact_data = cur.fetchall()
+                author_data = cur.fetchall()
                 out_data = {
                     'status': 'ok', # Установка статуса, что опреация выполнена успешно. # Нужно для работы JS функций
-                    'user': contact_data[0], # Сохранение всех данных о выбранном пользователе
+                    'user': author_data[0], # Сохранение всех данных о выбранном пользователе
                 }
         except:
             out_data = {
@@ -116,6 +119,7 @@ def save_author():
         sql = f"UPDATE blog_authors SET f='{f}', i='{i}', o='{o}' WHERE id={id}"
     else:
         sql = "INSERT INTO blog_authors (f, i, o)"
+        sql += f" VALUES('{f}','{i}','{o}')"
 
     # Попытка выполнить sql
     print(sql)

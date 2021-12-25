@@ -1,4 +1,4 @@
-$('#save_contact').click(function () {
+$('#save_author').click(function () {
     console.log('Сохранение автора');
     saveAuthor();
 });
@@ -80,7 +80,7 @@ function getAuthor(id)
 function deleteAuthor(id)
 {
     $.ajax({
-        url: '/delete_contact',
+        url: '/delete_author',
         type: 'POST',
         dataType: 'json',
         data: {
@@ -111,7 +111,7 @@ function saveAuthor()
         url: '/save_author',
         type: 'POST',
         dataType: 'json',
-        // Взятие данных из формы по атрибуту id, упаковка их в data и отправка на url: '/save_contact'
+        // Взятие данных из формы по атрибуту id, упаковка их в data и отправка на url: '/save_author'
         data: {
             id: $('#id').val(),
             f: $('#f').val(),
@@ -138,7 +138,7 @@ function saveAuthor()
     });
 }
 
-// Отображение списка контактов
+// Отображение списка авторов
 function renderAuthorList(data)
 {
     var html = '<p><button class="btn btn-primary" id="add_button">Добавить автора</button></p>';
