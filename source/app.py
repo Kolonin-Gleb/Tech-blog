@@ -6,6 +6,9 @@ from flask import request, jsonify
 import pymysql
 from pymysql.cursors import DictCursor
 
+# Для получения тек. времени при публикации статьи
+from datetime import datetime
+
 # Основным файлом для работы с Flask будет файл app.py
 # Папка static будет содержать неизменяемый JS и CSS
 app = Flask(__name__, static_folder="static")
@@ -289,14 +292,17 @@ def get_article():
             }
     # Создание новой статьи
     else:
+        now = datetime.now() # Получение тек. времени
+        now = now.strftime('%Y-%m-%d %H:%M:%S') # Конвертация времени в формат DATETIME MySQL
+        now = f"'{now}'" # Добавление ''
+
         new_article = {
             'id': 0,
             'fio': '',
             'category': '',
             'title': '',
             'article': '',
-            'dt': '',
-            'likes': 0,
+            'dt': now,
         }
         out_data = {
             'status': 'ok',
@@ -334,19 +340,18 @@ def save_article():
     title = str(request.form.get('title'))
     article = str(request.form.get('article'))
     dt = str(request.form.get('dt'))
-    likes = int(request.form.get('id'))
 
     # Проверка получения данных
-    print(f"{id}, {fio}, {category}, {title}, {article}, {dt}, {likes}")
+    print(f"{id}, {fio}, {category}, {title}, {article}, {dt}")
 
     sql = ''
     if id > 0:
         sql = f"UPDATE blog_articles_full SET fio='{fio}', category='{category}'"
-        sql += f" title='{title}', article='{article}', dt='{dt}', likes='{likes}'"
+        sql += f" title='{title}', article='{article}', dt='{dt}''"
         sql += f" WHERE id={id}"
     else:
-        sql = "INSERT INTO blog_articles_full (fio, category, title, article, dt, likes)"
-        sql += f" VALUE ('{fio}', '{category}', '{title}', '{article}', '{dt}', '{likes}')"
+        sql = "INSERT INTO blog_articles_full (fio, category, title, article, dt)"
+        sql += f" VALUE ('{fio}', '{category}', '{title}', '{article}', '{dt}')"
 
     # Попытка выполнить sql
     print(sql)
