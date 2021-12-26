@@ -19,16 +19,16 @@
         			<div class="article_form" style="display: none">
         				<h3>Статья</h3>
         				<!-- Форма редактирования статьи-->
-        				<form> 
+        				<form>
 							<div class="mb-3">
         						<label for="fio" class="form-label">Сменить автора</label>
         						<select id="fio" name="fio" required="required"></select>
         					</div>
-        					<!-- Выпадающий список -->
         					<div class="mb-3">
         						<label for="category" class="form-label">Сменить категорию</label>
         						<select id="category" name="category" required="required"></select>
         					</div>
+
 							<div class="mb-3">
 								<label for="title" class="form-label">Заголовок статьи</label>
 								<input type="text" class="form-control" id="title">
@@ -36,11 +36,13 @@
 							<div class="mb-3">
 								<label for="article" class="form-label">Текст статьи</label>
 								<input type="text" class="form-control" id="article">
+								<!-- type="textarrrrea?" -->
 							</div>
-							<div class="mb-3">
+							<!-- Дата и время публикации недоступны к редактированию -->
+							<!-- <div class="mb-3">
 								<label for="dt" class="form-label">Дата и время публикации статьи</label>
 								<input type="datetime-local" class="form-control" id="dt">
-							</div>
+							</div> -->
 
         					<div class="btn btn-primary" id="save_article">Сохранить</div>
         				</form>

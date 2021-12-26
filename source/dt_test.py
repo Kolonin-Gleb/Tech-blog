@@ -1,12 +1,3 @@
-# Для получения тек. времени при публикации статьи
-# from datetime import datetime, time
-
-# now = datetime.utcnow()
-# print(now)
-# now = f"{now.year} {now.month} {now.day} {now.hour} {now.minute}"
-# print(now)
-# print(type(now))
-
 # Для работы с БД
 import pymysql
 from pymysql.cursors import DictCursor
@@ -26,10 +17,10 @@ dbh = pymysql.connect(
 from datetime import datetime
 
 now = datetime.now() # Получение тек. времени
-id = 2
+id = 4
 now = now.strftime('%Y-%m-%d %H:%M:%S')
 print(now)
-
+# Тест сохранениия времени в БД
 try:
     with dbh.cursor() as cur:
         sql = f'INSERT INTO dt_test (id, dt) VALUES ("{id}", "{now}");'
@@ -38,4 +29,25 @@ try:
     print("Данные добавлены в таблицу")
 except:
     print("Ошибка добавления данных в таблицу")
+
+# Тест получения времени из БД
+# result = ''
+# try:
+#     with dbh.cursor() as cur:
+#         sql = ('SELECT * FROM dt_test where id='+str(id))
+#         print(sql)
+#         cur.execute(sql)
+#         result = cur.fetchall()
+#         print("Данные получены из таблицы")
+# except:
+#     print("Ошибка получения данных из таблицы")
+
+# # Перевод ответа в словарь
+# result = result[0]
+# print(result)
+
+# # Получаю только время из ответа на запрос
+# dt = result['dt']
+
+# print(dt) # Теперь dt в формате времени библиотеки datetime
 

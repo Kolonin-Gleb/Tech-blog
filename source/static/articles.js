@@ -5,7 +5,7 @@ $(function() {
 
 $('#save_article').click(function () {
     console.log('Сохранение статьи');
-    saveAuthor();
+    saveArticle();
 });
 
 function renderEditButton() {
@@ -72,7 +72,9 @@ function getArticle(id)
             if (data.status == 'ok')
             {
                 console.log("Статья загружена");
-                renderForm(data.user);
+                console.log("Данные статьи: ");
+                console.log(data.article);
+                renderForm(data.article);
             }
             else
             {
@@ -125,7 +127,7 @@ function saveArticle()
             category: $('#category').val(),
             title: $('#title').val(),
             article: $('#article').val(),
-            dt: $('#dt').val(),
+            dt: $('#dt').val(), //Какой формат даты и времени получит бекенд и как сохранит его в БД?
         },
         success: function (data) {
             console.log(data);
@@ -169,15 +171,18 @@ function renderArticleList(data)
     renderEditButton();
 }
 
-function renderForm(data) {
-    $('#id').val(data['id']),
-    $('#fio').val(data['fio']),
-    $('#category').val(data['category']),
-    $('#title').val(data['title']),
-    $('#article').val(data['article']),
-    $('#dt').val(data['dt']),
+function renderForm(data)
+{
+    console.log("Значения установливаются в форму");
+    $('#id').val(data['id']);
+    $('#fio').val(data['fio']);
+    $('#category').val(data['category']);
+    $('#title').val(data['title']);
+    $('#article').val(data['article']);
+    // $('#dt').val(data['dt']), // Запрет на редактирование даты и времени публикации
 
     $('#article_form').show();
+    console.log("Форма отображена");
 }
 
 

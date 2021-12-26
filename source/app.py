@@ -282,6 +282,15 @@ def get_article():
                 # Получение данных из представления статей
                 cur.execute('SELECT * FROM blog_articles_full WHERE id='+str(id))
                 article_data = cur.fetchall()
+
+                print("Полученные данные в виде словаря:")
+                print(article_data[0])
+                # # автоматическая трансформация врремени из запроса в формат времени библиотеки datetime
+                # dt = article_data['dt']
+                # # Установка времени в нужном формате обратно в запрос
+                # article_data[dt] = dt
+                # print(article_data[0])
+
                 out_data = {
                     'status': 'ok',
                     'article': article_data[0], 
@@ -295,6 +304,7 @@ def get_article():
         now = datetime.now() # Получение тек. времени
         now = now.strftime('%Y-%m-%d %H:%M:%S') # Конвертация времени в формат DATETIME MySQL
         now = f"'{now}'" # Добавление ''
+        # В итоге now хранит время в формате '2021-12-26 08:41:28'
 
         new_article = {
             'id': 0,
