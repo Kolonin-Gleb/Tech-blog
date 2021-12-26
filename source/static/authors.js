@@ -72,7 +72,7 @@ function getAuthor(id)
             if (data.status == 'ok')
             {
                 console.log("Автор загружен");
-                renderForm(data.user);
+                renderForm(data.author);
             }
             else
             {

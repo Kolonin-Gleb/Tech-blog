@@ -233,9 +233,9 @@ def save_category():
 
     sql = ''
     if id > 0:
-        sql = f"UPDATE blog_categories SET name='{category}' WHERE id={id}"
+        sql = f"UPDATE blog_categories SET category='{category}' WHERE id={id}"
     else:
-        sql = "INSERT INTO blog_categories (name)"
+        sql = "INSERT INTO blog_categories (category)"
         sql += f" VALUE ('{category}')"
 
     # Попытка выполнить sql
@@ -365,7 +365,7 @@ def save_article():
 
 
 # Запуск приложения на сервере колледжа
-app.run(debug = True, host='db-learning.ithub.ru', port=1198)
+app.run(debug = True, host='db-learning.ithub.ru', port=1110)
 
 # Запуск приложения на локальном пк
 # app.run(debug=True)
