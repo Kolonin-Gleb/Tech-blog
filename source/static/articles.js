@@ -160,7 +160,7 @@ function saveArticle()
             if (data.status == 'ok')
             {
                 console.log("Статья сохранена");
-                loadArticleList(); //TODO:
+                loadArticleList();
                 $('#article_form').hide();
             }
             else

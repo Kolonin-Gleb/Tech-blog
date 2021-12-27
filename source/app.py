@@ -13,6 +13,14 @@ from datetime import datetime
 # Папка static будет содержать неизменяемый JS и CSS
 app = Flask(__name__, static_folder="static")
 
+# Для конвертации времени из SQL в строку
+# Настройки для соединения с БД.
+conv = pymysql.converters.conversions.copy()
+conv[12] = str # Конвертация формата времени получаемого из БД в строку, формат которой позволяет загрузить данные обратно в БД 
+
+print("Просмотр кодов для настроек: \n")
+print(conv)
+
 # Установка соединения с БД
 dbh = pymysql.connect(
         host='185.12.94.106',
@@ -21,9 +29,10 @@ dbh = pymysql.connect(
         db='2p1s10',
         charset='utf8mb4',
         cursorclass=DictCursor,
-        autocommit=True
+        autocommit=True,
+        conv=conv # Добавление моих конвертеров при взаимодействии с БД
     )
-    
+
 # Запуск страниц сайта
 @app.route('/home')
 @app.route('/')
@@ -262,7 +271,7 @@ def save_category():
 def get_article_list():
     try:
         with dbh.cursor() as cur:
-            # Получение данных категорий
+            # Получение всех данных из представления
             cur.execute('SELECT * FROM blog_articles_full')
             articles = cur.fetchall()
     except:
@@ -312,11 +321,6 @@ def get_article():
 
                 print("Полученные данные о конретной статье в виде словаря:")
                 print(article_data[0])
-                # # автоматическая трансформация врремени из запроса в формат времени библиотеки datetime
-                # dt = article_data['dt']
-                # # Установка времени в нужном формате обратно в запрос
-                # article_data[dt] = dt
-                # print(article_data[0])
 
                 out_data = {
                     'status': 'ok',
@@ -335,8 +339,7 @@ def get_article():
         print("Начало создание статьи с id" + str(id))
         now = datetime.now() # Получение тек. времени
         now = now.strftime('%Y-%m-%d %H:%M:%S') # Конвертация времени в формат DATETIME MySQL
-        now = f"'{now}'" # Добавление ''
-        # В итоге now хранит время в формате '2021-12-26 08:41:28'
+        # В итоге now хранит время в формате 2021-12-26 08:41:28
 
         new_article = {
             'id': 0,
@@ -364,7 +367,7 @@ def delete_article():
     if int(id) > 0:
         try:
             with dbh.cursor() as cur:
-                cur.execute('DELETE FROM blog_articles_full WHERE id = '+str(id))
+                cur.execute('DELETE FROM blog_articles WHERE id = '+str(id))
                 out_data = {
                     'status': 'ok',
                 }
@@ -380,27 +383,29 @@ def delete_article():
 def save_article():
     # Получение данных data с помощью библ. request
     id = int(request.form.get('id'))
-    fio = str(request.form.get('fio'))
-    category = str(request.form.get('category'))
+    fio = str(request.form.get('fio')) #TODO: переименовать в fio_id или author_id
+    category = str(request.form.get('category')) #TODO: переименовать в category_id
     title = str(request.form.get('title'))
     article = str(request.form.get('article'))
     dt = str(request.form.get('dt'))
 
-    # Проверка получения данных
+    print("Данные полученные с фронтенда для сохранения в БД: \n")
     print(f"{id}, {fio}, {category}, {title}, {article}, {dt}")
 
+    # Обновление таблицы статей
     sql = ''
     if id > 0:
-        # Обновление таблиц, что содержат данные
-        sql = f"UPDATE blog_articles_full SET fio='{fio}', category='{category}'"
-        sql += f" title='{title}', article='{article}', dt='{dt}''"
-        sql += f" WHERE id={id}"
+        sql  = f"UPDATE blog_articles SET category_id='{category}', author_id={fio}, "
+        sql += f"title='{title}', article='{article}', dt='{dt}' "
+        sql += f"WHERE id={id}"
     else:
-        sql = "INSERT INTO blog_articles_full (fio, category, title, article, dt)"
+        sql = "INSERT INTO blog_articles (category_id, author_id, title, article, dt)"
         sql += f" VALUE ('{fio}', '{category}', '{title}', '{article}', '{dt}')"
 
     # Попытка выполнить sql
+    print("SQL запрос для выполнения: \n")
     print(sql)
+
     try:
         with dbh.cursor() as cur:
             cur.execute(sql)

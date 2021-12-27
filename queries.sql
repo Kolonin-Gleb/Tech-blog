@@ -63,6 +63,6 @@ ALTER TABLE `blog_articles`
 -- Создание представления со всеми данными
 
 CREATE OR REPLACE VIEW blog_articles_full AS SELECT
-a.id, CONCAT_WS(' ', a.f, a.i, a.o) AS fio, c.category, blog_articles.title, blog_articles.article, blog_articles.dt, blog_articles.likes
+blog_articles.id, CONCAT_WS(' ', a.f, a.i, a.o) AS fio, c.category, blog_articles.title, blog_articles.article, blog_articles.dt
 FROM blog_authors AS a, blog_categories AS c, blog_articles WHERE 
 a.id = blog_articles.author_id AND c.id = blog_articles.category_id;

@@ -17,7 +17,7 @@ dbh = pymysql.connect(
 from datetime import datetime
 
 now = datetime.now() # Получение тек. времени
-id = 4
+id = 5
 now = now.strftime('%Y-%m-%d %H:%M:%S')
 print(now)
 # Тест сохранениия времени в БД
