@@ -262,12 +262,13 @@ def save_category():
 def get_article_list():
     try:
         with dbh.cursor() as cur:
+            # Получение данных категорий
             cur.execute('SELECT * FROM blog_articles_full')
-            categories = cur.fetchall()
+            articles = cur.fetchall()
     except:
-        categories = { 'error': 'Ошибка чтения представления статей' }
+        articles = { 'error': 'Ошибка чтения статей' }
 
-    return jsonify(categories)
+    return jsonify(articles)
 
 
 @app.route('/get_article', methods=['POST'])
@@ -275,15 +276,41 @@ def get_article():
     out_data = {'status': 'error'}
     id = request.form.get('id') # получение id строчки категории из таблицы
 
+    categories = ''
+    # Взятие всех категорий из внешней таблицы
+    try:
+        with dbh.cursor() as cur:
+            cur.execute('SELECT * FROM blog_categories')
+            categories = cur.fetchall()
+    except:
+        out_data = {
+            'status': 'error',
+            'text': 'При загрузке всех категорий из внешней таблицы'
+        }
+        return jsonify(out_data)
+
+    authors = ''
+    # Взятие всех авторов из внешней таблицы
+    try:
+        with dbh.cursor() as cur:
+            cur.execute('SELECT id, CONCAT_WS(" ", a.f, a.i, a.o) AS fio FROM blog_authors a')
+            authors = cur.fetchall()
+    except pymysql.Error as e: # Получение кода ошибки pymysql
+        print("could not close connection error pymysql %d: %s" %(e.args[0], e.args[1]))
+        out_data = {
+            'status': 'error'
+        }
+        return jsonify(out_data)
+
     # Действия над существующей категорией
     if int(id) > 0:
         try:
             with dbh.cursor() as cur:
-                # Получение данных из представления статей
+                # Получение данных о конкретной статье
                 cur.execute('SELECT * FROM blog_articles_full WHERE id='+str(id))
                 article_data = cur.fetchall()
 
-                print("Полученные данные в виде словаря:")
+                print("Полученные данные о конретной статье в виде словаря:")
                 print(article_data[0])
                 # # автоматическая трансформация врремени из запроса в формат времени библиотеки datetime
                 # dt = article_data['dt']
@@ -293,7 +320,11 @@ def get_article():
 
                 out_data = {
                     'status': 'ok',
-                    'article': article_data[0], 
+                    # Передача данных о выбранной статье
+                    'article': article_data[0],
+                    # Передача данных о возможных категориях и авторах. Нужно для редактирования статьи
+                    'categories': categories, # Возможные категории из внешней таблицы
+                    'authors': authors, # Возможные авторы из внешней таблицы
                 }
         except:
             out_data = {
@@ -317,7 +348,10 @@ def get_article():
         }
         out_data = {
             'status': 'ok',
-            'article': new_article,
+            'article': new_article, # Передача данных о новой статье с значениями по умолчанию
+            # Передача данных о возможных категориях и авторах. Необходимо для выбора при редактировании
+            'categories': categories,
+            'authors': authors
         }
     return jsonify(out_data)
 
@@ -357,6 +391,7 @@ def save_article():
 
     sql = ''
     if id > 0:
+        # Обновление таблиц, что содержат данные
         sql = f"UPDATE blog_articles_full SET fio='{fio}', category='{category}'"
         sql += f" title='{title}', article='{article}', dt='{dt}''"
         sql += f" WHERE id={id}"
@@ -381,7 +416,7 @@ def save_article():
 
 
 # Запуск приложения на сервере колледжа
-app.run(debug = True, host='db-learning.ithub.ru', port=1110)
+app.run(debug = True, host='db-learning.ithub.ru', port=1189)
 
 # Запуск приложения на локальном пк
 # app.run(debug=True)

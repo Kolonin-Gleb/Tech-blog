@@ -56,7 +56,7 @@ function loadArticleList()
     });
 }
 
-// Загрузка конкретного контакта
+// Загрузка конкретной статьи
 function getArticle(id)
 {
     $.ajax({
@@ -71,12 +71,16 @@ function getArticle(id)
             console.log(data);
             if (data.status == 'ok')
             {
-                console.log("Статья загружена");
-                console.log("Данные статьи: ");
+                console.log("Данные загруженной статьи: ");
                 console.log(data.article);
+                console.log("Данные возможных категорий: ");
+                console.log(data.categories);
+                console.log("Данные возможных авторов: ");
+                console.log(data.authors);
 
-                
-
+                renderCategorySelectList(data.categories); // Отображение списка категорий
+                renderAuthorSelectList(data.authors); // Отображение списка авторов
+                // Отображение статьи
                 renderForm(data.article);
             }
             else
@@ -87,6 +91,24 @@ function getArticle(id)
         error: function(jqxhr, status, errorMsg) {
             console.log('Ошибка при взаимодействии с сервером: ' + errorMsg);
         }
+    });
+}
+
+// Отображение списка категорий
+function renderCategorySelectList(data)
+{
+    $('#category').find('option').remove();
+    data.forEach(function(item, i, data) {
+        $('#category').append($('<option>', { value: item['id'], text: item['category']}));
+    });
+}
+
+// Отображение списка авторов
+function renderAuthorSelectList(data)
+{
+    $('#fio').find('option').remove();
+    data.forEach(function(item, i, data) {
+        $('#fio').append($('<option>', { value: item['id'], text: item['fio']}));
     });
 }
 
@@ -124,6 +146,7 @@ function saveArticle()
         url: '/save_article',
         type: 'POST',
         dataType: 'json',
+        // Взятие данных из формы по id, упаковка их в data и отправка на url: '/save_article'
         data: {
             id: $('#id').val(),
             fio: $('#fio').val(),
@@ -137,7 +160,7 @@ function saveArticle()
             if (data.status == 'ok')
             {
                 console.log("Статья сохранена");
-                loadAuthorList();
+                loadArticleList(); //TODO:
                 $('#article_form').hide();
             }
             else
@@ -146,7 +169,7 @@ function saveArticle()
             }
         },
         error: function(jqxhr, status, errorMsg) {
-            console.log('Ошибка при взаимодействии с сервером: '+errorMsg);
+            console.log('Ошибка при взаимодействии с сервером: ' + errorMsg);
         }
     });
 }
@@ -177,12 +200,14 @@ function renderArticleList(data)
 function renderForm(data)
 {
     console.log("Значения установливаются в форму");
+    // Установка данных в input type="text"
     $('#id').val(data['id']);
-    $('#fio').val(data['fio']);
-    $('#category').val(data['category']);
     $('#title').val(data['title']);
     $('#article').val(data['article']);
-    $('#dt').val(data['dt']), // Запрет на редактирование даты и времени публикации
+    $('#dt').val(data['dt']);
+    // Установка данных в select (Выпадающие списки)
+    $('#fio option[value='+data['fio_id']+']').prop('selected', true);
+    $('#category option[value='+data['category_id']+']').prop('selected', true);
 
     $('#article_form').show();
     console.log("Форма отображена");
