@@ -301,6 +301,7 @@ def get_article():
             }
     # Создание новой статьи
     else:
+        print("Начало создание статьи с id" + str(id))
         now = datetime.now() # Получение тек. времени
         now = now.strftime('%Y-%m-%d %H:%M:%S') # Конвертация времени в формат DATETIME MySQL
         now = f"'{now}'" # Добавление ''

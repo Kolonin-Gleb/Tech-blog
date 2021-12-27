@@ -74,6 +74,9 @@ function getArticle(id)
                 console.log("Статья загружена");
                 console.log("Данные статьи: ");
                 console.log(data.article);
+
+                
+
                 renderForm(data.article);
             }
             else
@@ -159,7 +162,7 @@ function renderArticleList(data)
         html += "<td>"+item['category']+"</td>";
         html += "<td>"+item['title']+"</td>";
         html += "<td>"+item['article']+"</td>";
-        html += "<td>"+item['dt']+"</td>";
+        html += "<td>"+item['dt']+"</td>"; // Как установить дату и время
 
         html += '<td><i class="bi bi-pencil-square edit_button" data-id="'+item['id']+'"></i></td>';
         html += '<td><i class="bi bi-trash delete_button" data-id="'+item['id']+'"></i></td>';
@@ -179,7 +182,7 @@ function renderForm(data)
     $('#category').val(data['category']);
     $('#title').val(data['title']);
     $('#article').val(data['article']);
-    // $('#dt').val(data['dt']), // Запрет на редактирование даты и времени публикации
+    $('#dt').val(data['dt']), // Запрет на редактирование даты и времени публикации
 
     $('#article_form').show();
     console.log("Форма отображена");
