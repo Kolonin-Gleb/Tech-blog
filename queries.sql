@@ -39,8 +39,7 @@ CREATE TABLE `blog_articles` (
   `author_id` int(11) NOT NULL,
   `title` varchar(100) NOT NULL,
   `article` text NOT NULL,
-  `dt` datetime NOT NULL,
-  `likes` int(11) NOT NULL
+  `dt` datetime NOT NULL
 );
 
 
