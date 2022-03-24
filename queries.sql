@@ -13,7 +13,7 @@ ALTER TABLE `blog_authors`
 
 
 ALTER TABLE `blog_authors`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1;
 
 -- Создание таблицы категорий
 
@@ -27,7 +27,7 @@ ALTER TABLE `blog_categories`
   ADD PRIMARY KEY (`id`);
 
 ALTER TABLE `blog_categories`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1;
 
 
 
@@ -50,7 +50,7 @@ ALTER TABLE `blog_articles`
 
 
 ALTER TABLE `blog_articles`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1;
 
 
 ALTER TABLE `blog_articles`
