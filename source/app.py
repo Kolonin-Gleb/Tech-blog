@@ -25,7 +25,7 @@ print(conv)
 dbh = pymysql.connect(
         host='185.12.94.106',
         user='2p1s10',
-        password='404-086-366',
+        password='TOP SECRET. DO NOT HACK ME',
         db='2p1s10',
         charset='utf8mb4',
         cursorclass=DictCursor,
@@ -421,7 +421,7 @@ def save_article():
 
 
 # Запуск приложения на сервере колледжа
-app.run(debug = True, host='db-learning.ithub.ru', port=1189)
+app.run(debug = True, host='db-learning.ithub.ru', port=1177)
 
 # Запуск приложения на локальном пк
 # app.run(debug=True)
